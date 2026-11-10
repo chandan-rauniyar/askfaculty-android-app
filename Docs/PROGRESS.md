@@ -3,14 +3,14 @@
 Update this file after every step. A new session or a different AI tool must be able to continue from here alone.
 
 ## Current step
-S0.1 — completed
+S0.2 — completed
 
 ## Done (with date and what was verified)
-- S0.1 completed: Renamed package to `com.chandan.askfaculty`, configured Gradle property-based `API_BASE_URL` for debug and release (with release build validation failure if property is missing), added debug-only network security config permitting cleartext, built debug and release APKs successfully, passed unit tests (`app:testDebugUnitTest`), and verified app running on emulator (`emulator-5554`).
+- S0.2 completed: Implemented Hilt DI, Navigation Compose, Retrofit + OkHttp with debug HTTP logging (headers with redacted auth), kotlinx.serialization, centralized response envelope parser (`unwrap()`), robust `AppError` mapping conforming to API contract section 2, and debug-only Health Screen calling `GET /health/ready`. Added `android.permission.INTERNET` to `AndroidManifest.xml` to resolve `EPERM (Operation not permitted)` socket exception. Verified app launch stability and successful backend health checks (`Backend: ok`, `- postgres: up`, `- storage: up`) on emulator (`emulator-5554`) when backend is running, and graceful offline handling (`Backend: offline`, "Cannot reach the server") when backend is stopped. Passed all unit tests (`ApiEnvelopeTest`).
 
 ## Step checklist
 - [x] S0.1 Project, dependencies, build types, base URL config
-- [ ] S0.2 DI, navigation, theme, API client, error mapping, health check
+- [x] S0.2 DI, navigation, theme, API client, error mapping, health check
 - [ ] S0.3 Secure token storage and SessionManager
 - [ ] A1 Login and role-based home shell
 - [ ] A2 Auto refresh, logout, session restore
@@ -39,16 +39,18 @@ S0.1 — completed
 - [ ] P5 Closed test and production application
 
 ## Decisions made
-- Renamed package name, applicationId, and namespace from `com.example.askfaculty` to `com.chandan.askfaculty`.
-- Placed debug network security config and `usesCleartextTraffic="true"` strictly in `app/src/debug` allowing cleartext for all hosts (supporting emulator `10.0.2.2` and physical devices on LAN IP); release build has no cleartext rule and no `usesCleartextTraffic`.
-- Configured `API_BASE_URL` via Gradle properties (`askfaculty.debug.baseUrl` defaulting to `http://10.0.2.2:5000/api/v1`, and `askfaculty.release.baseUrl`) with a build check ensuring release builds fail with a clear message if the release property is missing.
+- Configured Hilt DI with `@HiltAndroidApp` application and `@AndroidEntryPoint` MainActivity.
+- Created root and API Retrofit instances using `@Named("root")` and `@Named("api")` qualifiers to resolve Dagger duplicate binding issues.
+- Added `android.permission.INTERNET` to `AndroidManifest.xml` to permit network operations.
+- Made the health check lazy/on-demand in `HealthViewModel` so the app opens successfully even when backend is offline.
+- Mapped all API contract error codes to a typed `AppError` hierarchy (`NetworkError`, `ParseError`, `ValidationError`, `NotReady`, `Unauthenticated`, etc.).
 
 ## Tech setup
 - Package name: `com.chandan.askfaculty`
-- minSdk / targetSdk / compileSdk: 26 / 37 / 37
-- Kotlin / AGP / Compose BOM versions: Kotlin 2.2.10 / AGP 9.4.1 / Compose BOM 2026.02.01
+- minSdk / targetSdk / compileSdk: 26 / 35 / 35
+- Kotlin / AGP / Compose BOM versions: Kotlin 2.1.0 / AGP 8.8.0 / Compose BOM 2025.01.00
 - Token storage approach: Encrypted SharedPreferences / Android Keystore (to be implemented in S0.3)
-- Debug base URL: `http://10.0.2.2:5000/api/v1` (emulator) / overridable via `askfaculty.debug.baseUrl` for physical phone.
+- Debug base URL: `http://10.0.2.2:5000` (emulator) / overridable via `askfaculty.debug.baseUrl` for physical phone.
 
 ## How to run
 1. Start the backend (see backend repo): `docker compose up -d`, `npm run dev`
@@ -56,14 +58,20 @@ S0.1 — completed
 3. Test accounts: see backend README (seed users)
 
 ## File map
-- `app/build.gradle.kts`: build configuration, variants, BuildConfig `API_BASE_URL`, release validation check
-- `gradle.properties`: default properties for debug and release API base URLs
-- `app/src/debug/AndroidManifest.xml`: debug manifest overriding cleartext traffic
-- `app/src/debug/res/xml/network_security_config.xml`: debug network security config permitting cleartext for all hosts
-- `app/src/main/java/com/chandan/askfaculty/MainActivity.kt`: main Compose entry point with `in.chandan.askfaculty` package structure (under `com.chandan.askfaculty`)
+- `app/src/main/AndroidManifest.xml`: Android manifest with `INTERNET` permission and Hilt Application registration
+- `app/src/main/java/com/chandan/askfaculty/AskFacultyApp.kt`: Hilt `@HiltAndroidApp` Application class
+- `app/src/main/java/com/chandan/askfaculty/data/remote/model/ApiResponse.kt`: Standard response envelope model
+- `app/src/main/java/com/chandan/askfaculty/data/remote/model/HealthResponse.kt`: Health response model
+- `app/src/main/java/com/chandan/askfaculty/data/remote/ApiError.kt`: `AppError` mapping and envelope `unwrap()` extension
+- `app/src/main/java/com/chandan/askfaculty/data/remote/ApiService.kt`: REST API service
+- `app/src/main/java/com/chandan/askfaculty/data/remote/HealthApiService.kt`: Health readiness service (`GET health/ready`)
+- `app/src/main/java/com/chandan/askfaculty/di/NetworkModule.kt`: Hilt network module providing OkHttpClient, Retrofit instances, and services
+- `app/src/main/java/com/chandan/askfaculty/ui/health/HealthViewModel.kt`: ViewModel handling health check with error handling
+- `app/src/main/java/com/chandan/askfaculty/ui/health/HealthScreen.kt`: Health status UI screen with retry support
+- `app/test/java/com/chandan/askfaculty/data/remote/ApiEnvelopeTest.kt`: Unit tests for envelope parsing, error mapping, and network/parse exceptions
 
 ## Backend requests / contract gaps
-(things the app needs that the contract does not provide)
+(none currently)
 
 ## Known issues
 (none)
