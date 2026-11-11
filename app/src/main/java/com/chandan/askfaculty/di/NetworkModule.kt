@@ -3,6 +3,7 @@ package com.chandan.askfaculty.di
 import android.util.Log
 import com.chandan.askfaculty.BuildConfig
 import com.chandan.askfaculty.data.remote.ApiService
+import com.chandan.askfaculty.data.remote.AuthApiService
 import com.chandan.askfaculty.data.remote.HealthApiService
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
@@ -98,5 +99,11 @@ object NetworkModule {
     @Singleton
     fun provideApiService(@Named("api") apiRetrofit: Retrofit): ApiService {
         return apiRetrofit.create(ApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAuthApiService(@Named("api") apiRetrofit: Retrofit): AuthApiService {
+        return apiRetrofit.create(AuthApiService::class.java)
     }
 }

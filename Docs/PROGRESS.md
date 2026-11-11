@@ -3,16 +3,16 @@
 Update this file after every step. A new session or a different AI tool must be able to continue from here alone.
 
 ## Current step
-S0.3 — completed
+A1 — completed
 
 ## Done (with date and what was verified)
-- S0.3 completed: Implemented secure token storage (`TokenStorage`) using `EncryptedSharedPreferences` backed by Android Keystore (AES-256 GCM / AES-256 SIV), created `SessionManager` exposing session state as a `StateFlow`, excluded token shared preferences (`secure_tokens_prefs.xml`) from Android backups (`backup_rules.xml` and `data_extraction_rules.xml`), added unit tests (`SessionManagerTest`), passed all unit tests (8 passed), and verified successful build and test execution.
+- A1 completed: Implemented Login screen (`LoginScreen`), `AuthApiService` (`POST /auth/login`, `GET /auth/me`), `AuthRepository`, `LoginViewModel` with specific error handling (`INVALID_CREDENTIALS` mapped to generic sign-in failure, `ACCOUNT_INACTIVE` mapped to college support contact message), and role-based home shell (`HomeShell` for `STUDENT`, `FACULTY`, `COLLEGE_ADMIN`). Added unit tests (`LoginViewModelTest`), passed all unit tests (11 passed), and tested successfully on the emulator against the local backend using seed users.
 
 ## Step checklist
 - [x] S0.1 Project, dependencies, build types, base URL config
 - [x] S0.2 DI, navigation, theme, API client, error mapping, health check
 - [x] S0.3 Secure token storage and SessionManager
-- [ ] A1 Login and role-based home shell
+- [x] A1 Login and role-based home shell
 - [ ] A2 Auto refresh, logout, session restore
 - [ ] A3 Activation, forgot/reset password
 - [ ] G1 Group list with unread badges
@@ -39,9 +39,8 @@ S0.3 — completed
 - [ ] P5 Closed test and production application
 
 ## Decisions made
-- **Token storage approach:** `EncryptedSharedPreferences` from `androidx.security:security-crypto` backed by Android Keystore (AES-256 GCM for values, AES-256 SIV for keys). Chosen because it provides hardware-backed secure storage for sensitive auth tokens without using deprecated methods, adhering strictly to Android security best practices.
-- Excluded `secure_tokens_prefs.xml` from full-backup (`backup_rules.xml`) and data-extraction (`data_extraction_rules.xml`) to prevent tokens from leaking via device backups or cloud sync.
-- Exposed session state as a reactive `StateFlow<Session>` in `SessionManager`.
+- **Login error handling:** Mapped `INVALID_CREDENTIALS` to a generic failure message ("Invalid email or password.") and `ACCOUNT_INACTIVE` to college support instructions ("Your account is inactive. Please contact college support."), ensuring passwords are never stored in memory or logged.
+- **Role-based navigation:** Observed `SessionManager.session` flow in `MainActivity` to switch seamlessly between `LoginScreen` and `HomeShell`.
 
 ## Tech setup
 - Package name: `com.chandan.askfaculty`
@@ -56,12 +55,14 @@ S0.3 — completed
 3. Test accounts: see backend README (seed users)
 
 ## File map
-- `app/src/main/res/xml/backup_rules.xml`: Excludes `secure_tokens_prefs.xml` from full backup
-- `app/src/main/res/xml/data_extraction_rules.xml`: Excludes `secure_tokens_prefs.xml` from cloud backup and device transfer
-- `app/src/main/java/com/chandan/askfaculty/data/local/TokenStorage.kt`: Encrypted token storage using Android Keystore
-- `app/src/main/java/com/chandan/askfaculty/data/local/SessionManager.kt`: Reactive session manager exposing state flow
-- `app/src/main/java/com/chandan/askfaculty/data/remote/model/User.kt`: User model
-- `app/test/java/com/chandan/askfaculty/data/local/SessionManagerTest.kt`: Unit tests for session management and token operations
+- `app/src/main/java/com/chandan/askfaculty/data/remote/model/LoginRequest.kt`: Login request and auth session models
+- `app/src/main/java/com/chandan/askfaculty/data/remote/AuthApiService.kt`: Auth REST endpoints (`/auth/login`, `/auth/me`)
+- `app/src/main/java/com/chandan/askfaculty/data/repository/AuthRepository.kt`: Auth repository for sign-in and profile fetch
+- `app/src/main/java/com/chandan/askfaculty/ui/auth/LoginViewModel.kt`: Login ViewModel with contract-compliant error mapping
+- `app/src/main/java/com/chandan/askfaculty/ui/auth/LoginScreen.kt`: Material 3 login screen
+- `app/src/main/java/com/chandan/askfaculty/ui/home/HomeShell.kt`: Role-based landing shell with logout action
+- `app/src/main/java/com/chandan/askfaculty/MainActivity.kt`: Root activity observing session flow
+- `app/test/java/com/chandan/askfaculty/ui/auth/LoginViewModelTest.kt`: Unit tests for login success, invalid credentials, and inactive account states
 
 ## Backend requests / contract gaps
 (none currently)
