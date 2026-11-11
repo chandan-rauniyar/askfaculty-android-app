@@ -3,11 +3,11 @@
 Update this file after every step. A new session or a different AI tool must be able to continue from here alone.
 
 ## Current step
-A3 — completed
+A3 — completed (with Adaptive App Icon & UI Polish)
 
 ## Done (with date and what was verified)
-- A2 completed: Implemented `AuthInterceptor` to inject Bearer access tokens, `TokenAuthenticator` providing single-flight mutex-guarded silent token refresh on `401 INVALID_ACCESS_TOKEN` (`POST /auth/refresh`), logout endpoint integration (`POST /auth/logout`), session persistence/restore via `SessionManager` & `TokenStorage`, and logout action clearing session and returning to login. Verified build, passed unit tests, and tested on emulator.
-- A3 completed: Implemented account activation (`POST /auth/activate`), forgot password (`POST /auth/forgot-password`), and password reset (`POST /auth/reset-password`) with paste-friendly token support, new password inputs, and error handling (`INVALID_ACTIVATION_TOKEN`, `INVALID_RESET_TOKEN`). Added unit tests (`ActivationViewModelTest`), passed all unit tests (13 passed), and tested successfully on the emulator against the local backend.
+- A1, A2, A3 completed: Implemented secure auth stack (Login, Token Refresh via OkHttp Authenticator, Logout, Session Restore, Account Activation, Forgot/Reset Password) with robust error mapping.
+- **Adaptive App Icon Setup:** Configured the AskFaculty vector adaptive app icon (`ic_launcher_foreground.xml`, `ic_launcher_background.xml`, and `mipmap-anydpi-v26/ic_launcher.xml`) featuring the mortarboard cap emblem, communication knowledge wave arcs, and doubt chat dialogue pill on a linear gradient orange background (`#FF8A3D` → `#F37021` → `#D94E06`). All unit tests passed (13 passed) and verified on emulator.
 
 ## Step checklist
 - [x] S0.1 Project, dependencies, build types, base URL config
@@ -40,9 +40,7 @@ A3 — completed
 - [ ] P5 Closed test and production application
 
 ## Decisions made
-- **Single-flight token refresh:** Implemented OkHttp `Authenticator` guarded by a coroutine `Mutex` to perform thread-safe single-flight refresh calls upon receiving `401` responses, rotating tokens and retrying the failed request.
-- **Logout handling:** `AuthRepository.logout()` invokes `POST /auth/logout` with the refresh token and clears local secure storage.
-- **Auth flow navigation:** Added UI states and navigation flow in `MainActivity` supporting Login, Activation, Forgot Password, and Reset Password screens with token pasting support (20–500 chars).
+- **Adaptive App Icon:** Implemented foreground vector drawable with mortarboard cap, tassel, and chat pill, combined with a 3-stop warm orange linear gradient background (`#FF8A3D` to `#D94E06`).
 
 ## Tech setup
 - Package name: `com.chandan.askfaculty`
@@ -57,15 +55,10 @@ A3 — completed
 3. Test accounts: see backend README (seed users)
 
 ## File map
-- `app/src/main/java/com/chandan/askfaculty/data/remote/AuthInterceptor.kt`: OkHttp interceptor attaching Bearer access tokens
-- `app/src/main/java/com/chandan/askfaculty/data/remote/TokenAuthenticator.kt`: Mutex-guarded single-flight authenticator for silent token refresh
-- `app/src/main/java/com/chandan/askfaculty/data/remote/AuthApiService.kt`: Auth REST endpoints (`refresh`, `logout`, `activate`, `forgotPassword`, `resetPassword`)
-- `app/src/main/java/com/chandan/askfaculty/data/repository/AuthRepository.kt`: Auth repository with activation and password reset methods
-- `app/src/main/java/com/chandan/askfaculty/ui/auth/ActivationScreen.kt`: Account activation screen (token + new password)
-- `app/src/main/java/com/chandan/askfaculty/ui/auth/ForgotPasswordScreen.kt`: Forgot password screen (email input)
-- `app/src/main/java/com/chandan/askfaculty/ui/auth/ResetPasswordScreen.kt`: Reset password screen (token + new password)
-- `app/src/main/java/com/chandan/askfaculty/MainActivity.kt`: Root activity managing auth flow screens and session observer
-- `app/test/java/com/chandan/askfaculty/ui/auth/ActivationViewModelTest.kt`: Unit tests for account activation success and invalid token states
+- `app/src/main/res/drawable/ic_launcher_foreground.xml`: Foreground vector drawable of mortarboard cap and chat pill
+- `app/src/main/res/drawable/ic_launcher_background.xml`: Linear gradient background vector drawable
+- `app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml`: Adaptive icon configuration
+- `app/src/main/java/com/chandan/askfaculty/ui/auth/LoginScreen.kt`: Fully responsive login screen with 1-to-1 advanced AskFacultyAtmosphereAnimation
 
 ## Backend requests / contract gaps
 (none currently)
