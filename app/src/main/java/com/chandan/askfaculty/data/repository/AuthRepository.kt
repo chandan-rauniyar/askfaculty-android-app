@@ -4,6 +4,7 @@ import com.chandan.askfaculty.data.local.SessionManager
 import com.chandan.askfaculty.data.remote.AuthApiService
 import com.chandan.askfaculty.data.remote.model.AuthSession
 import com.chandan.askfaculty.data.remote.model.LoginRequest
+import com.chandan.askfaculty.data.remote.model.RefreshRequest
 import com.chandan.askfaculty.data.remote.model.User
 import com.chandan.askfaculty.data.remote.unwrap
 import javax.inject.Inject
@@ -18,6 +19,19 @@ class AuthRepository @Inject constructor(
         val session: AuthSession = authApiService.login(LoginRequest(email, password)).unwrap()
         sessionManager.saveSession(session.accessToken, session.refreshToken, session.user)
         return session.user
+    }
+
+    suspend fun logout() {
+        try {
+            val token = sessionManager.refreshToken
+            if (!token.isNullOrBlank()) {
+                authApiService.logout(RefreshRequest(token))
+            }
+        } catch (_: Exception) {
+            // Even if network logout fails, clear local session
+        } finally {
+            sessionManager.clearSession()
+        }
     }
 
     suspend fun fetchMe(): User {

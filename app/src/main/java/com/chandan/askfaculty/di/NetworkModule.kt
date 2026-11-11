@@ -4,7 +4,9 @@ import android.util.Log
 import com.chandan.askfaculty.BuildConfig
 import com.chandan.askfaculty.data.remote.ApiService
 import com.chandan.askfaculty.data.remote.AuthApiService
+import com.chandan.askfaculty.data.remote.AuthInterceptor
 import com.chandan.askfaculty.data.remote.HealthApiService
+import com.chandan.askfaculty.data.remote.TokenAuthenticator
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
@@ -33,11 +35,16 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
+    fun provideOkHttpClient(
+        authInterceptor: AuthInterceptor,
+        tokenAuthenticator: TokenAuthenticator
+    ): OkHttpClient {
         val builder = OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(10, TimeUnit.SECONDS)
             .writeTimeout(10, TimeUnit.SECONDS)
+            .addInterceptor(authInterceptor)
+            .authenticator(tokenAuthenticator)
 
         if (BuildConfig.DEBUG) {
             val loggingInterceptor = HttpLoggingInterceptor { message ->
