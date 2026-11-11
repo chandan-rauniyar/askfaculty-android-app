@@ -15,7 +15,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 fun LoginScreen(
     modifier: Modifier = Modifier,
     viewModel: LoginViewModel = hiltViewModel(),
-    onLoginSuccess: () -> Unit
+    onLoginSuccess: () -> Unit,
+    onNavigateToActivate: () -> Unit,
+    onNavigateToForgot: () -> Unit,
+    onNavigateToReset: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -77,6 +80,23 @@ fun LoginScreen(
                     )
                 } else {
                     Text("Sign In")
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                TextButton(onClick = onNavigateToActivate) {
+                    Text("Activate")
+                }
+                TextButton(onClick = onNavigateToForgot) {
+                    Text("Forgot?")
+                }
+                TextButton(onClick = onNavigateToReset) {
+                    Text("Reset")
                 }
             }
 

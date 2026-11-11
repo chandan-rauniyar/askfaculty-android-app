@@ -2,9 +2,12 @@ package com.chandan.askfaculty.data.repository
 
 import com.chandan.askfaculty.data.local.SessionManager
 import com.chandan.askfaculty.data.remote.AuthApiService
+import com.chandan.askfaculty.data.remote.model.ActivateRequest
 import com.chandan.askfaculty.data.remote.model.AuthSession
+import com.chandan.askfaculty.data.remote.model.EmailRequest
 import com.chandan.askfaculty.data.remote.model.LoginRequest
 import com.chandan.askfaculty.data.remote.model.RefreshRequest
+import com.chandan.askfaculty.data.remote.model.ResetPasswordRequest
 import com.chandan.askfaculty.data.remote.model.User
 import com.chandan.askfaculty.data.remote.unwrap
 import javax.inject.Inject
@@ -32,6 +35,18 @@ class AuthRepository @Inject constructor(
         } finally {
             sessionManager.clearSession()
         }
+    }
+
+    suspend fun activate(token: String, password: String) {
+        authApiService.activate(ActivateRequest(token, password)).unwrap()
+    }
+
+    suspend fun forgotPassword(email: String) {
+        authApiService.forgotPassword(EmailRequest(email.trim().lowercase())).unwrap()
+    }
+
+    suspend fun resetPassword(token: String, password: String) {
+        authApiService.resetPassword(ResetPasswordRequest(token, password)).unwrap()
     }
 
     suspend fun fetchMe(): User {

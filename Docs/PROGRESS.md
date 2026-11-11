@@ -3,18 +3,19 @@
 Update this file after every step. A new session or a different AI tool must be able to continue from here alone.
 
 ## Current step
-A1 — completed
+A3 — completed
 
 ## Done (with date and what was verified)
-- A1 completed: Implemented Login screen (`LoginScreen`), `AuthApiService` (`POST /auth/login`, `GET /auth/me`), `AuthRepository`, `LoginViewModel` with specific error handling (`INVALID_CREDENTIALS` mapped to generic sign-in failure, `ACCOUNT_INACTIVE` mapped to college support contact message), and role-based home shell (`HomeShell` for `STUDENT`, `FACULTY`, `COLLEGE_ADMIN`). Added unit tests (`LoginViewModelTest`), passed all unit tests (11 passed), and tested successfully on the emulator against the local backend using seed users.
+- A2 completed: Implemented `AuthInterceptor` to inject Bearer access tokens, `TokenAuthenticator` providing single-flight mutex-guarded silent token refresh on `401 INVALID_ACCESS_TOKEN` (`POST /auth/refresh`), logout endpoint integration (`POST /auth/logout`), session persistence/restore via `SessionManager` & `TokenStorage`, and logout action clearing session and returning to login. Verified build, passed unit tests, and tested on emulator.
+- A3 completed: Implemented account activation (`POST /auth/activate`), forgot password (`POST /auth/forgot-password`), and password reset (`POST /auth/reset-password`) with paste-friendly token support, new password inputs, and error handling (`INVALID_ACTIVATION_TOKEN`, `INVALID_RESET_TOKEN`). Added unit tests (`ActivationViewModelTest`), passed all unit tests (13 passed), and tested successfully on the emulator against the local backend.
 
 ## Step checklist
 - [x] S0.1 Project, dependencies, build types, base URL config
 - [x] S0.2 DI, navigation, theme, API client, error mapping, health check
 - [x] S0.3 Secure token storage and SessionManager
 - [x] A1 Login and role-based home shell
-- [ ] A2 Auto refresh, logout, session restore
-- [ ] A3 Activation, forgot/reset password
+- [x] A2 Auto refresh, logout, session restore
+- [x] A3 Activation, forgot/reset password
 - [ ] G1 Group list with unread badges
 - [ ] G2 Group detail tabs and members
 - [ ] N1 Announcements
@@ -39,8 +40,9 @@ A1 — completed
 - [ ] P5 Closed test and production application
 
 ## Decisions made
-- **Login error handling:** Mapped `INVALID_CREDENTIALS` to a generic failure message ("Invalid email or password.") and `ACCOUNT_INACTIVE` to college support instructions ("Your account is inactive. Please contact college support."), ensuring passwords are never stored in memory or logged.
-- **Role-based navigation:** Observed `SessionManager.session` flow in `MainActivity` to switch seamlessly between `LoginScreen` and `HomeShell`.
+- **Single-flight token refresh:** Implemented OkHttp `Authenticator` guarded by a coroutine `Mutex` to perform thread-safe single-flight refresh calls upon receiving `401` responses, rotating tokens and retrying the failed request.
+- **Logout handling:** `AuthRepository.logout()` invokes `POST /auth/logout` with the refresh token and clears local secure storage.
+- **Auth flow navigation:** Added UI states and navigation flow in `MainActivity` supporting Login, Activation, Forgot Password, and Reset Password screens with token pasting support (20–500 chars).
 
 ## Tech setup
 - Package name: `com.chandan.askfaculty`
@@ -55,14 +57,15 @@ A1 — completed
 3. Test accounts: see backend README (seed users)
 
 ## File map
-- `app/src/main/java/com/chandan/askfaculty/data/remote/model/LoginRequest.kt`: Login request and auth session models
-- `app/src/main/java/com/chandan/askfaculty/data/remote/AuthApiService.kt`: Auth REST endpoints (`/auth/login`, `/auth/me`)
-- `app/src/main/java/com/chandan/askfaculty/data/repository/AuthRepository.kt`: Auth repository for sign-in and profile fetch
-- `app/src/main/java/com/chandan/askfaculty/ui/auth/LoginViewModel.kt`: Login ViewModel with contract-compliant error mapping
-- `app/src/main/java/com/chandan/askfaculty/ui/auth/LoginScreen.kt`: Material 3 login screen
-- `app/src/main/java/com/chandan/askfaculty/ui/home/HomeShell.kt`: Role-based landing shell with logout action
-- `app/src/main/java/com/chandan/askfaculty/MainActivity.kt`: Root activity observing session flow
-- `app/test/java/com/chandan/askfaculty/ui/auth/LoginViewModelTest.kt`: Unit tests for login success, invalid credentials, and inactive account states
+- `app/src/main/java/com/chandan/askfaculty/data/remote/AuthInterceptor.kt`: OkHttp interceptor attaching Bearer access tokens
+- `app/src/main/java/com/chandan/askfaculty/data/remote/TokenAuthenticator.kt`: Mutex-guarded single-flight authenticator for silent token refresh
+- `app/src/main/java/com/chandan/askfaculty/data/remote/AuthApiService.kt`: Auth REST endpoints (`refresh`, `logout`, `activate`, `forgotPassword`, `resetPassword`)
+- `app/src/main/java/com/chandan/askfaculty/data/repository/AuthRepository.kt`: Auth repository with activation and password reset methods
+- `app/src/main/java/com/chandan/askfaculty/ui/auth/ActivationScreen.kt`: Account activation screen (token + new password)
+- `app/src/main/java/com/chandan/askfaculty/ui/auth/ForgotPasswordScreen.kt`: Forgot password screen (email input)
+- `app/src/main/java/com/chandan/askfaculty/ui/auth/ResetPasswordScreen.kt`: Reset password screen (token + new password)
+- `app/src/main/java/com/chandan/askfaculty/MainActivity.kt`: Root activity managing auth flow screens and session observer
+- `app/test/java/com/chandan/askfaculty/ui/auth/ActivationViewModelTest.kt`: Unit tests for account activation success and invalid token states
 
 ## Backend requests / contract gaps
 (none currently)
