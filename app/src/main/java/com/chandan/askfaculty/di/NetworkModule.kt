@@ -5,6 +5,7 @@ import com.chandan.askfaculty.BuildConfig
 import com.chandan.askfaculty.data.remote.ApiService
 import com.chandan.askfaculty.data.remote.AuthApiService
 import com.chandan.askfaculty.data.remote.AuthInterceptor
+import com.chandan.askfaculty.data.remote.GroupApiService
 import com.chandan.askfaculty.data.remote.HealthApiService
 import com.chandan.askfaculty.data.remote.TokenAuthenticator
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
@@ -112,5 +113,11 @@ object NetworkModule {
     @Singleton
     fun provideAuthApiService(@Named("api") apiRetrofit: Retrofit): AuthApiService {
         return apiRetrofit.create(AuthApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGroupApiService(@Named("api") apiRetrofit: Retrofit): GroupApiService {
+        return apiRetrofit.create(GroupApiService::class.java)
     }
 }

@@ -3,11 +3,10 @@
 Update this file after every step. A new session or a different AI tool must be able to continue from here alone.
 
 ## Current step
-A3 — completed (with Adaptive App Icon & UI Polish)
+G1 — completed
 
 ## Done (with date and what was verified)
-- A1, A2, A3 completed: Implemented secure auth stack (Login, Token Refresh via OkHttp Authenticator, Logout, Session Restore, Account Activation, Forgot/Reset Password) with robust error mapping.
-- **Adaptive App Icon Setup:** Configured the AskFaculty vector adaptive app icon (`ic_launcher_foreground.xml`, `ic_launcher_background.xml`, and `mipmap-anydpi-v26/ic_launcher.xml`) featuring the mortarboard cap emblem, communication knowledge wave arcs, and doubt chat dialogue pill on a linear gradient orange background (`#FF8A3D` → `#F37021` → `#D94E06`). All unit tests passed (13 passed) and verified on emulator.
+- G1 completed: Implemented `GroupApiService` (`GET /groups`, `GET /me/unread-summary`), `GroupRepository`, `GroupsViewModel`, and `GroupsScreen` displaying enrolled groups with unread summary badges and loading/empty/error states. Integrated the official 5-tab bottom navigation shell (`HomeShell`: Home, Groups, Doubts, Alerts, Profile) in `MainActivity`. Verified build success, passed all unit tests (13 passed), and verified operation on emulator.
 
 ## Step checklist
 - [x] S0.1 Project, dependencies, build types, base URL config
@@ -16,7 +15,7 @@ A3 — completed (with Adaptive App Icon & UI Polish)
 - [x] A1 Login and role-based home shell
 - [x] A2 Auto refresh, logout, session restore
 - [x] A3 Activation, forgot/reset password
-- [ ] G1 Group list with unread badges
+- [x] G1 Group list with unread badges
 - [ ] G2 Group detail tabs and members
 - [ ] N1 Announcements
 - [ ] N2 Notes list and download
@@ -40,7 +39,8 @@ A3 — completed (with Adaptive App Icon & UI Polish)
 - [ ] P5 Closed test and production application
 
 ## Decisions made
-- **Adaptive App Icon:** Implemented foreground vector drawable with mortarboard cap, tassel, and chat pill, combined with a 3-stop warm orange linear gradient background (`#FF8A3D` to `#D94E06`).
+- **5-Tab Bottom Navigation (`HomeShell`):** Configured Material 3 `NavigationBar` with Home, Groups, Doubts, Alerts, and Profile tabs.
+- **Group List & Unread Summary:** Combined `GET /groups` and `GET /me/unread-summary` into `GroupsViewModel` to display combined unread counts for each group card.
 
 ## Tech setup
 - Package name: `com.chandan.askfaculty`
@@ -55,10 +55,12 @@ A3 — completed (with Adaptive App Icon & UI Polish)
 3. Test accounts: see backend README (seed users)
 
 ## File map
-- `app/src/main/res/drawable/ic_launcher_foreground.xml`: Foreground vector drawable of mortarboard cap and chat pill
-- `app/src/main/res/drawable/ic_launcher_background.xml`: Linear gradient background vector drawable
-- `app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml`: Adaptive icon configuration
-- `app/src/main/java/com/chandan/askfaculty/ui/auth/LoginScreen.kt`: Fully responsive login screen with 1-to-1 advanced AskFacultyAtmosphereAnimation
+- `app/src/main/java/com/chandan/askfaculty/data/remote/model/Group.kt`: Group and UnreadSummary data models
+- `app/src/main/java/com/chandan/askfaculty/data/remote/GroupApiService.kt`: Group endpoints (`GET /groups`, `GET /me/unread-summary`)
+- `app/src/main/java/com/chandan/askfaculty/data/repository/GroupRepository.kt`: Group repository
+- `app/src/main/java/com/chandan/askfaculty/ui/groups/GroupsViewModel.kt`: Groups ViewModel managing loading, success, and error states
+- `app/src/main/java/com/chandan/askfaculty/ui/groups/GroupsScreen.kt`: Group list screen with unread count badges and empty states
+- `app/src/main/java/com/chandan/askfaculty/ui/home/HomeShell.kt`: 5-tab bottom navigation shell (Home, Groups, Doubts, Alerts, Profile)
 
 ## Backend requests / contract gaps
 (none currently)
