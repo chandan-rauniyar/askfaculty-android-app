@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,6 +48,16 @@ class MainActivity : ComponentActivity() {
                 val session by sessionManager.session.collectAsState()
                 val coroutineScope = rememberCoroutineScope()
                 var authScreen by remember { mutableStateOf(AuthFlowScreen.LOGIN) }
+
+                LaunchedEffect(session.isLoggedIn) {
+                    if (session.isLoggedIn && session.user == null) {
+                        try {
+                            authRepository.fetchMe()
+                        } catch (_: Exception) {
+                            // If token is invalid, authenticator/interceptor will handle clearing session
+                        }
+                    }
+                }
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     if (session.isLoggedIn) {

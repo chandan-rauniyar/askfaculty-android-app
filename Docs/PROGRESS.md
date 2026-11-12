@@ -3,10 +3,15 @@
 Update this file after every step. A new session or a different AI tool must be able to continue from here alone.
 
 ## Current step
-G1 — completed
+G1 — completed (with Role-Based Bottom Navigation for Student, Faculty, & Admin)
 
 ## Done (with date and what was verified)
-- G1 completed: Implemented `GroupApiService` (`GET /groups`, `GET /me/unread-summary`), `GroupRepository`, `GroupsViewModel`, and `GroupsScreen` displaying enrolled groups with unread summary badges and loading/empty/error states. Integrated the official 5-tab bottom navigation shell (`HomeShell`: Home, Groups, Doubts, Alerts, Profile) in `MainActivity`. Verified build success, passed all unit tests (13 passed), and verified operation on emulator.
+- G1 completed: Implemented `GroupApiService` (`GET /groups`, `GET /me/unread-summary`), `GroupRepository`, `GroupsViewModel`, and `GroupsScreen`.
+- **Role-Based Bottom Navigation:** Configured `FloatingGlassDock` and `HomeShell` to dynamically adapt the bottom navigation bar tabs and home dashboards based on the authenticated user's role:
+  - **Student:** `Home`, `Groups`, `Doubts`, `Alerts`, `Profile`
+  - **Faculty:** `Home`, `Questions`, `Groups`, `Messages`, `Profile`
+  - **College Admin:** `Dashboard`, `Users`, `Academics`, `Groups`, `Profile`
+  All unit tests passed (13 passed) and verified successfully on emulator.
 
 ## Step checklist
 - [x] S0.1 Project, dependencies, build types, base URL config
@@ -39,8 +44,7 @@ G1 — completed
 - [ ] P5 Closed test and production application
 
 ## Decisions made
-- **5-Tab Bottom Navigation (`HomeShell`):** Configured Material 3 `NavigationBar` with Home, Groups, Doubts, Alerts, and Profile tabs.
-- **Group List & Unread Summary:** Combined `GET /groups` and `GET /me/unread-summary` into `GroupsViewModel` to display combined unread counts for each group card.
+- **Role-Aware Bottom Navigation Tabs:** Dynamically map `DockTab` destinations based on `user?.role` (`STUDENT`, `FACULTY`, `COLLEGE_ADMIN`).
 
 ## Tech setup
 - Package name: `com.chandan.askfaculty`
@@ -55,12 +59,9 @@ G1 — completed
 3. Test accounts: see backend README (seed users)
 
 ## File map
-- `app/src/main/java/com/chandan/askfaculty/data/remote/model/Group.kt`: Group and UnreadSummary data models
-- `app/src/main/java/com/chandan/askfaculty/data/remote/GroupApiService.kt`: Group endpoints (`GET /groups`, `GET /me/unread-summary`)
-- `app/src/main/java/com/chandan/askfaculty/data/repository/GroupRepository.kt`: Group repository
-- `app/src/main/java/com/chandan/askfaculty/ui/groups/GroupsViewModel.kt`: Groups ViewModel managing loading, success, and error states
-- `app/src/main/java/com/chandan/askfaculty/ui/groups/GroupsScreen.kt`: Group list screen with unread count badges and empty states
-- `app/src/main/java/com/chandan/askfaculty/ui/home/HomeShell.kt`: 5-tab bottom navigation shell (Home, Groups, Doubts, Alerts, Profile)
+- `app/src/main/java/com/chandan/askfaculty/ui/main/FloatingGlassDock.kt`: Role-aware floating glass dock with dynamic tabs for Student, Faculty, and Admin
+- `app/src/main/java/com/chandan/askfaculty/ui/home/HomeShell.kt`: Main navigation shell wiring up role-specific dashboards and tabs
+- `app/src/main/java/com/chandan/askfaculty/ui/groups/GroupsScreen.kt`: Group list screen with unread badges
 
 ## Backend requests / contract gaps
 (none currently)
