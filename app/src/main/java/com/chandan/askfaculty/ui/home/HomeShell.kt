@@ -9,8 +9,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.chandan.askfaculty.data.remote.model.GroupDto
 import com.chandan.askfaculty.data.remote.model.User
+import com.chandan.askfaculty.data.remote.model.UserRole
+import com.chandan.askfaculty.ui.groups.GroupDetailScreen
 import com.chandan.askfaculty.ui.groups.GroupsScreen
+import com.chandan.askfaculty.ui.main.AskFacultyTopBar
 import com.chandan.askfaculty.ui.main.DockBadge
 import com.chandan.askfaculty.ui.main.DockTab
 import com.chandan.askfaculty.ui.main.FloatingGlassDock
@@ -44,50 +48,82 @@ fun HomeShell(
         DockTab.Alerts to if (hasAlerts) DockBadge.Dot else null
     ).filterValues { it != null }.mapValues { it.value!! }
 
+    val userRoleEnum = when (user?.role) {
+        "FACULTY" -> UserRole.FACULTY
+        "COLLEGE_ADMIN" -> UserRole.COLLEGE_ADMIN
+        else -> UserRole.STUDENT
+    }
+
     Box(
         modifier = modifier
             .fillMaxSize()
             .background(Color(0xFFF7F9FB))
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = 120.dp)
+        Column(
+            modifier = Modifier.fillMaxSize()
         ) {
-            when (selectedTab) {
-                DockTab.Home -> {
-                    RoleDashboardContent(user, "Student / Faculty Home Dashboard")
-                }
-                DockTab.Groups -> {
-                    GroupsScreen(
-                        onGroupClick = { group ->
-                            // TODO: Navigate to Group Detail (G2)
+            // AskFaculty Top Bar shown ONLY when on Home or AdminDashboard
+            if (selectedTab == DockTab.Home || selectedTab == DockTab.AdminDashboard) {
+                AskFacultyTopBar(
+                    notificationCount = doubtsUnread + groupsTotalUnread,
+                    onNotificationsClick = { selectedTab = DockTab.Alerts }
+                )
+            }
+
+            // Screen Content with bottom padding so content scrolls behind the floating dock
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(bottom = 120.dp)
+            ) {
+                when (selectedTab) {
+                    DockTab.Home -> {
+                        RoleDashboardContent(user, "Student / Faculty Home Dashboard")
+                    }
+                    DockTab.Groups -> {
+                        var selectedGroup by remember { mutableStateOf<GroupDto?>(null) }
+                        if (selectedGroup != null) {
+                            GroupDetailScreen(
+                                groupId = selectedGroup!!.id,
+                                onBack = { selectedGroup = null }
+                            )
+                        } else {
+                            GroupsScreen(
+                                role = userRoleEnum,
+                                onOpenGroup = { group ->
+                                    selectedGroup = group
+                                },
+                                onOpenNotifications = {
+                                    selectedTab = DockTab.Alerts
+                                }
+                            )
                         }
-                    )
-                }
-                DockTab.Doubts -> {
-                    PlaceholderScreen("Doubts Inbox (My Doubts)")
-                }
-                DockTab.FacultyQuestions -> {
-                    PlaceholderScreen("Faculty Questions Answering Queue")
-                }
-                DockTab.FacultyMessages -> {
-                    PlaceholderScreen("Faculty Messages & Chat Inbox")
-                }
-                DockTab.Alerts -> {
-                    PlaceholderScreen("Alerts / Notifications")
-                }
-                DockTab.Profile -> {
-                    ProfileContent(user, onLogout)
-                }
-                DockTab.AdminDashboard -> {
-                    RoleDashboardContent(user, "College Admin Dashboard")
-                }
-                DockTab.AdminUsers -> {
-                    PlaceholderScreen("Admin Users Management")
-                }
-                DockTab.AdminAcademics -> {
-                    PlaceholderScreen("Admin Academics Setup")
+                    }
+                    DockTab.Doubts -> {
+                        PlaceholderScreen("Doubts Inbox (My Doubts)")
+                    }
+                    DockTab.FacultyQuestions -> {
+                        PlaceholderScreen("Faculty Questions Answering Queue")
+                    }
+                    DockTab.FacultyMessages -> {
+                        PlaceholderScreen("Faculty Messages & Chat Inbox")
+                    }
+                    DockTab.Alerts -> {
+                        PlaceholderScreen("Alerts / Notifications")
+                    }
+                    DockTab.Profile -> {
+                        ProfileContent(user, onLogout)
+                    }
+                    DockTab.AdminDashboard -> {
+                        RoleDashboardContent(user, "College Admin Dashboard")
+                    }
+                    DockTab.AdminUsers -> {
+                        PlaceholderScreen("Admin Users Management")
+                    }
+                    DockTab.AdminAcademics -> {
+                        PlaceholderScreen("Admin Academics Setup")
+                    }
                 }
             }
         }

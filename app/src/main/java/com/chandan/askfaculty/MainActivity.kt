@@ -68,7 +68,7 @@ class MainActivity : ComponentActivity() {
                                     authRepository.logout()
                                 }
                             },
-                            modifier = Modifier.padding(innerPadding)
+                            modifier = Modifier.fillMaxSize()
                         )
                     } else {
                         when (authScreen) {

@@ -3,15 +3,11 @@
 Update this file after every step. A new session or a different AI tool must be able to continue from here alone.
 
 ## Current step
-G1 — completed (with Role-Based Bottom Navigation for Student, Faculty, & Admin)
+G1 & G2 — completed (with Notification Badge Alignment Fix)
 
 ## Done (with date and what was verified)
-- G1 completed: Implemented `GroupApiService` (`GET /groups`, `GET /me/unread-summary`), `GroupRepository`, `GroupsViewModel`, and `GroupsScreen`.
-- **Role-Based Bottom Navigation:** Configured `FloatingGlassDock` and `HomeShell` to dynamically adapt the bottom navigation bar tabs and home dashboards based on the authenticated user's role:
-  - **Student:** `Home`, `Groups`, `Doubts`, `Alerts`, `Profile`
-  - **Faculty:** `Home`, `Questions`, `Groups`, `Messages`, `Profile`
-  - **College Admin:** `Dashboard`, `Users`, `Academics`, `Groups`, `Profile`
-  All unit tests passed (13 passed) and verified successfully on emulator.
+- G1 & G2 completed: Implemented group list and group detail screens with 5 tabs and members list.
+- **Notification Badge Alignment Fix:** Refined the bell notification icon badge in `GroupsScreen` (`FloatingTopBar`) to match the clean overlay styling (white border ring, shadow, and correct offset), showing real unread notification counts from `GET /notifications/unread-count`. All unit tests passed (13 passed) and verified successfully on emulator.
 
 ## Step checklist
 - [x] S0.1 Project, dependencies, build types, base URL config
@@ -21,7 +17,7 @@ G1 — completed (with Role-Based Bottom Navigation for Student, Faculty, & Admi
 - [x] A2 Auto refresh, logout, session restore
 - [x] A3 Activation, forgot/reset password
 - [x] G1 Group list with unread badges
-- [ ] G2 Group detail tabs and members
+- [x] G2 Group detail tabs and members
 - [ ] N1 Announcements
 - [ ] N2 Notes list and download
 - [ ] N3 Faculty note upload
@@ -44,7 +40,7 @@ G1 — completed (with Role-Based Bottom Navigation for Student, Faculty, & Admi
 - [ ] P5 Closed test and production application
 
 ## Decisions made
-- **Role-Aware Bottom Navigation Tabs:** Dynamically map `DockTab` destinations based on `user?.role` (`STUDENT`, `FACULTY`, `COLLEGE_ADMIN`).
+- **Notification Badge Styling:** Aligned badge positioning and borders on `GroupsScreen` top bar bell with `AskFacultyTopBar`.
 
 ## Tech setup
 - Package name: `com.chandan.askfaculty`
@@ -59,9 +55,10 @@ G1 — completed (with Role-Based Bottom Navigation for Student, Faculty, & Admi
 3. Test accounts: see backend README (seed users)
 
 ## File map
-- `app/src/main/java/com/chandan/askfaculty/ui/main/FloatingGlassDock.kt`: Role-aware floating glass dock with dynamic tabs for Student, Faculty, and Admin
-- `app/src/main/java/com/chandan/askfaculty/ui/home/HomeShell.kt`: Main navigation shell wiring up role-specific dashboards and tabs
-- `app/src/main/java/com/chandan/askfaculty/ui/groups/GroupsScreen.kt`: Group list screen with unread badges
+- `app/src/main/java/com/chandan/askfaculty/ui/groups/GroupsScreen.kt`: Groups screen with aligned notification badge and floating top bar
+- `app/src/main/java/com/chandan/askfaculty/ui/main/AskFacultyTopBar.kt`: Home top bar component
+- `app/src/main/java/com/chandan/askfaculty/ui/main/FloatingGlassDock.kt`: Floating glass dock component
+- `app/src/main/java/com/chandan/askfaculty/ui/home/HomeShell.kt`: Main navigation shell
 
 ## Backend requests / contract gaps
 (none currently)
